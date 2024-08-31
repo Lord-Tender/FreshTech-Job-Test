@@ -1,4 +1,9 @@
 const { userModel } = require("../Models/user.Model");
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
+const secret = process.env.SECRET
 const { passwordResetEmailTemplate } = require("../Extra/user.template")
 
 
@@ -15,8 +20,6 @@ const registerUser = (req, res) => {
     user.save()
         .then(data => {
             res.status(201).json({ status: "Register sucessfully", data: data })
-            sendEmails(email, "Welcome to Tender Pay", welcomeTem(firstName))
-            sendEmails(email, "Email verification", verifyEmailTemplate(firstName, emailVerifyToken))
         })
         .catch(err => {
             if (err) {
@@ -29,7 +32,7 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body
 
     try {
-        let user = await userModel.findOne({ 'email': email })
+        let user = await userModel.findOne({ email })
         if (user) {
             const comparedPassword = bcrypt.compareSync(password, user.password)
             if (comparedPassword) {
@@ -50,10 +53,26 @@ const loginUser = async (req, res) => {
     }
 }
 
+const pageAuth = async (req, res) => {
+    let token = req.headers.authorization.split(" ")[1]
+    jwt.verify(token, secret, (err, result) => {
+        if (err) {
+            return res.status(400).json({ Message: "User not found", error: err })
+        } else {
+            let userId = result.userId
+            userModel.findById(userId)
+                .then((userResult) => {
+                    let emailVerified = userResult.emailInfo.emailVerified
+                    return res.status(200).json({ Message: "User found", user: result, emailVerified, userResult })
+                })
+        }
+    })
+}
+
 const resetPassword = (req, res) => {
     const { email } = req.body
     try {
-        userModel.findOne({ 'emailInfo.email': email })
+        userModel.findOne({ email })
             .then((user) => {
                 if (user) {
                     let newPassword = generateNewPassword()
@@ -134,6 +153,7 @@ const sendEmails = (email, subject, html) => {
 module.exports = {
     registerUser,
     loginUser,
+    pageAuth,
     resetPassword,
     changePassword
 }
