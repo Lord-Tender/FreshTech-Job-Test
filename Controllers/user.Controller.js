@@ -25,6 +25,32 @@ const registerUser = (req, res) => {
         })
 }
 
+const loginUser = async (req, res) => {
+    const { email, password } = req.body
+
+    try {
+        let user = await userModel.findOne({ 'email': email })
+        if (user) {
+            const comparedPassword = bcrypt.compareSync(password, user.password)
+            if (comparedPassword) {
+                const token = jwt.sign({ userId: user._id }, secret, { expiresIn: "1d" });
+                res.status(200).json({
+                    Message: "User found",
+                    token: token,
+                    user: user
+                })
+            } else {
+                res.status(400).json({ Message: "Invalid detail" })
+            }
+        } else {
+            res.status(400).json({ Message: "Invalid detail" })
+        }
+    }
+    catch (err) {
+    }
+}
+
 module.exports = {
-    registerUser
+    registerUser,
+    loginUser
 }
