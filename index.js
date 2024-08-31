@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const userRouter = require("./Routes/user.Route")
 
 app.use(cors())
-app.use(express.json({ limit: '20mb' }))
 app.use('/user', userRouter)
 
 
