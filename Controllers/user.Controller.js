@@ -50,6 +50,35 @@ const loginUser = async (req, res) => {
     }
 }
 
+
+
+const changePassword = (req, res) => {
+    const { email, oldPassword, newPassword } = req.body
+    userModel.findOne({ 'email': email })
+        .then((user) => {
+            const comparedPassword = bcrypt.compareSync(oldPassword, user.password)
+            const comparedNewPassword = bcrypt.compareSync(newPassword, user.password)
+            if (comparedNewPassword) {
+                res.status(400).json({ mgs: "New password cannot be same as old password", status: false })
+            } else if (comparedPassword) {
+                const hashPassword = bcrypt.hashSync(newPassword, 10)
+                user.password = hashPassword
+                user.save()
+                    .then((newUser) => {
+                        res.status(200).json({ mgs: "Changed successfully", status: true })
+                    })
+                    .catch((error) => {
+                    })
+            } else {
+                res.status(400).json({ mgs: "Incorrect password", status: false })
+            }
+        })
+        .catch((err) => {
+            res.status(400).json({ mgs: "can not find user", status: false })
+        })
+
+}
+
 module.exports = {
     registerUser,
     loginUser
