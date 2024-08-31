@@ -1,5 +1,5 @@
 const { userModel } = require("../Models/user.Model");
-
+const { passwordResetEmailTemplate } = require("../Extra/user.template")
 
 
 const registerUser = (req, res) => {
@@ -50,7 +50,38 @@ const loginUser = async (req, res) => {
     }
 }
 
-
+const resetPassword = (req, res) => {
+    const { email } = req.body
+    try {
+        userModel.findOne({ 'emailInfo.email': email })
+            .then((user) => {
+                if (user) {
+                    let newPassword = generateNewPassword()
+                    let hashNewPassword = bcrypt.hashSync(newPassword, 10);
+                    user.password = hashNewPassword
+                    user.save()
+                        .then((newData) => {
+                            sendEmails(email, "Password Reset", passwordResetEmailTemplate(user.firstName, newPassword))
+                                .then((mail) => {
+                                    res.status(200).json({ msg: "Sent successfully", mail })
+                                })
+                                .catch((mailErr) => {
+                                    res.status(200).json({ msg: "error", mailErr })
+                                })
+                        })
+                        .catch((err) => {
+                        })
+                } else {
+                    res.status(500).json({ mgs: "User not found" })
+                }
+            })
+            .catch((err) => {
+                res.status(500).json({ mgs: "User not found", err })
+            })
+    }
+    catch (error) {
+    }
+}
 
 const changePassword = (req, res) => {
     const { email, oldPassword, newPassword } = req.body
@@ -79,7 +110,30 @@ const changePassword = (req, res) => {
 
 }
 
+// Sending email with nodemailer
+
+const sendEmails = (email, subject, html) => {
+    return new Promise((resolve, reject) => {
+        const emailBody = {
+            from: process.env.NODEMAILER_USER,
+            to: email,
+            subject: subject,
+            html: html
+        }
+
+        transporter.sendMail(emailBody, (err, info) => {
+            if (err) {
+                reject({ msg: 'An error', status: false, err });
+            } else {
+                resolve({ msg: 'Email sent successful', status: true, info });
+            }
+        });
+    })
+}
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    resetPassword,
+    changePassword
 }
