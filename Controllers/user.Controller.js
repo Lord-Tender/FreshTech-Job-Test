@@ -8,6 +8,7 @@ const { passwordResetEmailTemplate } = require("../Extra/user.template")
 
 
 const registerUser = (req, res) => {
+    
     const { firstName, lastName, email, password } = req.body
     const hashPassword = bcrypt.hashSync(password, 10);
 
@@ -19,6 +20,8 @@ const registerUser = (req, res) => {
     })
     user.save()
         .then(data => {
+            console.log(data)
+
             res.status(201).json({ status: "Register sucessfully", data: data })
         })
         .catch(err => {
@@ -30,6 +33,8 @@ const registerUser = (req, res) => {
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body
+    console.log(req.body);
+    
 
     try {
         let user = await userModel.findOne({ email })
@@ -130,6 +135,14 @@ const changePassword = (req, res) => {
 }
 
 // Sending email with nodemailer
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS
+    }
+});
 
 const sendEmails = (email, subject, html) => {
     return new Promise((resolve, reject) => {

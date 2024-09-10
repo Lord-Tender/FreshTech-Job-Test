@@ -10,5 +10,5 @@ userSchema = new mongoose.Schema(
 )
 
 module.exports = {
-    userSchema: mongoose.model('user', userSchema)
+    userModel: mongoose.model('user', userSchema)
 }
