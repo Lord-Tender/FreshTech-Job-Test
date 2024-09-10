@@ -67,8 +67,7 @@ const pageAuth = async (req, res) => {
             let userId = result.userId
             userModel.findById(userId)
                 .then((userResult) => {
-                    let emailVerified = userResult.emailInfo.emailVerified
-                    return res.status(200).json({ Message: "User found", user: result, emailVerified, userResult })
+                    return res.status(200).json({ Message: "User found", user: userResult })
                 })
         }
     })
