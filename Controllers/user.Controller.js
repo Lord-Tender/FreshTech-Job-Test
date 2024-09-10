@@ -73,11 +73,42 @@ const pageAuth = async (req, res) => {
     })
 }
 
+const generateNewPassword = () => {
+    let randomSm = "abcdefghijklmnopqrstuvwxyz"
+    let randomSmall = ""
+    for (let index = 1; index <= 3; index++) {
+        randomSmall += randomSm.charAt(Math.floor(Math.random() * randomSm.length))
+    }
+
+    let randomCa = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let randomCapital = ""
+    for (let index = 1; index <= 2; index++) {
+        randomCapital += randomCa.charAt(Math.floor(Math.random() * randomCa.length))
+    }
+
+    let randomNo = "0123456789"
+    let randomNumber = ""
+    for (let index = 1; index <= 2; index++) {
+        randomNumber += randomNo.charAt(Math.floor(Math.random() * randomNo.length))
+    }
+
+    let randomSp = '!@#$%^&*()?:{}'
+    let randomSpecial = ""
+    for (let index = 1; index <= 1; index++) {
+        randomSpecial += randomSp.charAt(Math.floor(Math.random() * randomSp.length))
+    }
+    let randomText = `${randomCapital}${randomSmall}${randomSpecial}${randomNumber}`
+
+    return randomText
+}
+
 const resetPassword = (req, res) => {
     const { email } = req.body
+    console.log(email)
     try {
         userModel.findOne({ email })
             .then((user) => {
+                console.log(user);
                 if (user) {
                     let newPassword = generateNewPassword()
                     let hashNewPassword = bcrypt.hashSync(newPassword, 10);
@@ -98,11 +129,9 @@ const resetPassword = (req, res) => {
                     res.status(500).json({ mgs: "User not found" })
                 }
             })
-            .catch((err) => {
-                res.status(500).json({ mgs: "User not found", err })
-            })
     }
     catch (error) {
+        res.status(500).json({ mgs: "User not found" })
     }
 }
 
