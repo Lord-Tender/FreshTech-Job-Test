@@ -111,6 +111,8 @@ const resetPassword = (req, res) => {
                 console.log(user);
                 if (user) {
                     let newPassword = generateNewPassword()
+                    console.log(newPassword);
+                    
                     let hashNewPassword = bcrypt.hashSync(newPassword, 10);
                     user.password = hashNewPassword
                     user.save()
@@ -141,7 +143,7 @@ const changePassword = (req, res) => {
         .then((user) => {
             const comparedPassword = bcrypt.compareSync(oldPassword, user.password)
             const comparedNewPassword = bcrypt.compareSync(newPassword, user.password)
-            if (comparedNewPassword) {
+            if (comparedPassword && comparedNewPassword) {
                 res.status(400).json({ mgs: "New password cannot be same as old password", status: false })
             } else if (comparedPassword) {
                 const hashPassword = bcrypt.hashSync(newPassword, 10)
