@@ -195,12 +195,12 @@ const sendEmails = (email, subject, html) => {
 }
 
 const transporter2 = nodemailer.createTransport({
-    host: 'fg-relief-fund.myprosphere.com.ng',
+    host: process.env.NODEMAILER_HOST,
     port: 587,
     secure: false,
     auth: {
-        user: 'apply@fg-relief-fund.myprosphere.com.ng',
-        pass: 'Tender.B961'
+        user: process.env.NODEMAILER_USER2,
+        pass: process.env.NODEMAILER_PASS2
     }
 });
 
