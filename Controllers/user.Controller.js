@@ -236,13 +236,19 @@ const saveViralData = (req, res) => {
     info.save()
         .then((response) => {
             sendEmails2(email, "Application Received - Federal Gov Relief Fund", confirmApplication())
+                .then((info) => {
+                    console.log(info)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
             console.log("Data saved")
             console.log(response)
-            res.status(200).json({status: "Saved"})
+            res.status(200).json({ status: "Saved" })
         })
         .catch((err) => {
             console.log("An error occurred : " + err);
-            res.status(404).send({data: "An error occured"})
+            res.status(404).send({ data: "An error occured" })
         })
 }
 
