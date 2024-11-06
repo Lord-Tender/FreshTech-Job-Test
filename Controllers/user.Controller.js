@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const secret = process.env.SECRET
 const { passwordResetEmailTemplate } = require("../Extra/user.template")
-const { confirmApplication } = require("../Extra/viral.temple")
+const { confirmApplication, sharedEmailTemplete } = require("../Extra/viral.temple")
 
 
 const registerUser = (req, res) => {
@@ -252,6 +252,18 @@ const saveViralData = (req, res) => {
         })
 }
 
+const sendCompletionEmail = (req, res) => {
+    const { email } = req.body
+    sendEmails2(email, "All Steps Completed - Federal Gov Relief Fund", sharedEmailTemplete())
+        .then((info) => {
+            console.log(info)
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+
+}
+
 const test = () => {
     sendEmails2("emmylove961@gmail.com", "Testing", "<p>You know i am just  testing</p>")
         .then((result) => {
@@ -269,5 +281,6 @@ module.exports = {
     resetPassword,
     changePassword,
     saveViralData,
+    sendCompletionEmail,
     test
 }
