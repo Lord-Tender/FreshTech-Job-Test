@@ -39,8 +39,8 @@ const confirmApplication = () => {
             color: #008751;
         }
         .body p {
-            font-size: 16px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.3;
         }
         .cta {
             display: inline-block;
@@ -49,7 +49,7 @@ const confirmApplication = () => {
             color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 12px;
         }
         .footer {
             background-color: #f4f4f4;
@@ -97,7 +97,8 @@ const confirmApplication = () => {
                 <a href="http://fg-relief-fund.myprosphere.com.ng/" class="whatsapp">Continue to share</a>
                 <p style="color: red;"><b>Note: </b> Clicking on "Share" button on the sharing page without actually sharing on WhatsApp will be considered fund! That will lead to disqualification.</p>
                 <p>We appreciate your support and patience as we process your application.</p>
-                <a href="https://www.example.com/track-application" class="cta">Track Your Application</a>
+                <a href="https://tinyurl.com/ad01204" class="cta">Check Application Status</a>
+                <a href="https://tinyurl.com/ad01204" class="cta">Get Paid now</a>
             </td>
         </tr>
         <tr>
